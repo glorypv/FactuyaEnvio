@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
+    <system systemId="https://e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService?wsdl" uri="xml-resources/web-service-references/billService_1/wsdl/e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService.wsdl"/>
+    <system systemId="https://e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService?ns1.wsdl" uri="xml-resources/web-service-references/billService_1/wsdl/e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService.ns1.wsdl"/>
+    <system systemId="https://e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService?ns2.wsdl" uri="xml-resources/web-service-references/billService_1/wsdl/e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService.ns2.wsdl"/>
+    <system systemId="https://e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService.xsd2.xsd" uri="xml-resources/web-service-references/billService_1/wsdl/e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService.xsd2.xsd"/>
+    <system systemId="https://ose.nubefact.com/ol-ti-itcpe/billService?wsdl" uri="xml-resources/web-service-references/billService/wsdl/ose.nubefact.com/ol-ti-itcpe/billService.wsdl"/>
+    <system systemId="https://e-guiaremision.sunat.gob.pe/ol-ti-itemision-guia-gem/billService?wsdl" uri="xml-resources/web-service-references/billService_2/wsdl/e-guiaremision.sunat.gob.pe/ol-ti-itemision-guia-gem/billService.wsdl"/>
+    <system systemId="https://e-guiaremision.sunat.gob.pe/ol-ti-itemision-guia-gem/billService?ns1.wsdl" uri="xml-resources/web-service-references/billService_2/wsdl/e-guiaremision.sunat.gob.pe/ol-ti-itemision-guia-gem/billService.ns1.wsdl"/>
+    <system systemId="https://e-guiaremision.sunat.gob.pe/ol-ti-itemision-guia-gem/billService.xsd2.xsd" uri="xml-resources/web-service-references/billService_2/wsdl/e-guiaremision.sunat.gob.pe/ol-ti-itemision-guia-gem/billService.xsd2.xsd"/>
+</catalog>

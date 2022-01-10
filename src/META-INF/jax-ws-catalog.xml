@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
+    <system systemId="https://ose.nubefact.com/ol-ti-itcpe/billService?wsdl" uri="wsdl/ose.nubefact.com/ol-ti-itcpe/billService.wsdl"/>
+    <system systemId="https://e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService?wsdl" uri="wsdl/e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService.wsdl"/>
+    <system systemId="https://e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService?ns1.wsdl" uri="wsdl/e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService.ns1.wsdl"/>
+    <system systemId="https://e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService?ns2.wsdl" uri="wsdl/e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService.ns2.wsdl"/>
+    <system systemId="https://e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService.xsd2.xsd" uri="wsdl/e-factura.sunat.gob.pe/ol-ti-itcpfegem/billService.xsd2.xsd"/>
+</catalog>
