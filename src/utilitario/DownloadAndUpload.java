@@ -10,6 +10,7 @@
 package utilitario;
 
 import com.jcraft.jsch.*;
+import factuya.factura.clsFactura;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -17,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.logging.Level;
 
 public class DownloadAndUpload {
@@ -143,10 +145,6 @@ public class DownloadAndUpload {
 
             File SunatSend = new File(ubicacion + ubicacionEnvio);
             File SunatAnwser = new File(ubicacion + ubicacionRespuesta);
-            /*
-             SunatSend.mkdir();
-             SunatAnwser.mkdir();
-             */
             if (channel != null) {
 
                 String dirSend = SunatSend.getPath();
@@ -159,10 +157,7 @@ public class DownloadAndUpload {
                 ChannelSftp sftp = (ChannelSftp) channel;
 
                 msj = msj + "\n ... INICIAR SUBIDA A SERVIDOR ... \n";
-                /*  if (Main.invoice.dP != null) {
-                 Main.invoice.dP.p.getTxtarea().append("\n ... INICIAR SUBIDA A SERVIDOR ... \n");
-                 Main.invoice.dP.p.getTxtarea().setCaretPosition(Main.invoice.dP.p.getTxtarea().getDocument().getLength());
-                 }*/
+
                 for (int i = 0; i < numFileSend; i++) {
                     File file = new File(dirSend, listFileSend[i]);
                     if (file.exists()) {
@@ -176,11 +171,6 @@ public class DownloadAndUpload {
                         //  sftp.chmod(Integer.parseInt("0777", 8), ubicacionServidor + ubicacionEnvio + file.getName());
                         System.out.println("... Subiendo ENVIO ..." + file.getName());
                         msj = msj + "... Subiendo ENVIO ..." + file.getName() + "\n";
-                        /*    if (Main.invoice.dP != null) {
-                         msj =msj+
-                         Main.invoice.dP.p.getTxtarea().append("... Subiendo ENVIO ..." + file.getName() + "\n");
-                         Main.invoice.dP.p.getTxtarea().setCaretPosition(Main.invoice.dP.p.getTxtarea().getDocument().getLength());
-                         }*/
                         File filen = new File(dirSend, file.getName());
                         if (filen.exists()) {
                             filen.delete();
@@ -197,10 +187,6 @@ public class DownloadAndUpload {
                         sftp.put(dirAnwser + "/" + file.getName(), file.getName());//poner rutaaaaaaaaa
                         sftp.chmod(Integer.parseInt("0777", 8), ubicacionServidor + ubicacionRespuesta + file.getName());
                         msj = msj + "... Subiendo RPTA ..." + file.getName() + "\n";
-                        /*   if (Main.invoice.dP != null) {
-                         Main.invoice.dP.p.getTxtarea().append("... Subiendo ENVIO ..." + file.getName() + "\n");
-                         Main.invoice.dP.p.getTxtarea().setCaretPosition(Main.invoice.dP.p.getTxtarea().getDocument().getLength());
-                         }*/
                         File filen = new File(dirAnwser, file.getName());
                         if (filen.exists()) {
                             filen.delete();
@@ -210,21 +196,80 @@ public class DownloadAndUpload {
                     }
                 }
                 msj = msj + "\n... FINALIZAR SUBIDA A SERVIDOR ... \n";
-                /*  if (Main.invoice.dP != null) {
-                 Main.invoice.dP.p.getTxtarea().append("\n... FINALIZAR SUBIDA A SERVIDOR ... \n");
-                 Main.invoice.dP.p.getTxtarea().setCaretPosition(Main.invoice.dP.p.getTxtarea().getDocument().getLength());
-                 }*/
+
             }
         } catch (SftpException ex) {
             msj = msj + "Error  " + ex.getMessage() + "\n";
-            /*    if (Main.invoice.dP != null) {
-             Main.invoice.dP.p.getTxtarea().append("Error  " + ex.getMessage() + "\n");
-             Main.invoice.dP.p.getTxtarea().setCaretPosition(Main.invoice.dP.p.getTxtarea().getDocument().getLength());
-             }*/
             java.util.logging.Logger.getLogger(DownloadAndUpload.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             return msj;
         }
+    }
+
+    public String uploadSFTPs(String ubicacionLocal, String extension, String ubicacionServidor) {
+        try {
+
+            File sunatUbicacionLocal = new File(ubicacionLocal);
+            if (channel != null) {
+
+                String dir = sunatUbicacionLocal.getPath();
+                String[] listFile = new File(dir).list(new Filtre(extension));
+                int numFileSend = listFile.length;
+
+                ChannelSftp sftp = (ChannelSftp) channel;
+
+                msj = msj + "\n ... INICIAR SUBIDA A SERVIDOR ... \n";
+
+                for (int i = 0; i < numFileSend; i++) {
+                    File file = new File(dir, listFile[i]);
+                    if (file.exists()) {
+                        sftp.cd(ubicacionServidor);
+                        System.out.println(ubicacionServidor);
+                        sftp.put(dir + "/" + file.getName(), ubicacionServidor + file.getName());
+                        System.out.println("... Subiendo ENVIO ..." + file.getName());
+                        msj = msj + "... Subiendo ENVIO ..." + file.getName() + "\n";
+                        File filen = new File(dir, file.getName());
+                        if (filen.exists()) {
+                            filen.delete();
+                        }
+                        file.renameTo(filen);
+
+                    }
+                }
+
+                msj = msj + "\n... FINALIZAR SUBIDA A SERVIDOR ... \n";
+
+            }
+        } catch (SftpException ex) {
+            msj = msj + "Error  " + ex.getMessage() + "\n";
+            java.util.logging.Logger.getLogger(DownloadAndUpload.class.getName()).log(Level.SEVERE, null, ex);
+        } finally {
+            return msj;
+        }
+    }
+
+    public ArrayList leerArchivosCarpeta(String ubicacion, String ubicacionSunat) {
+        File archivoSunat = new File(ubicacion + ubicacionSunat);
+        ArrayList<clsFactura> facturaArray = new ArrayList<clsFactura>();
+        String dirSend = archivoSunat.getPath();
+        String[] listFileSend = new File(dirSend).list(new Filtre(".zip"));
+        int numFileSend = listFileSend.length;
+        msj = msj + "\n ... INICIAR SUBIDA A SERVIDOR ... \n";
+        for (int i = 0; i < numFileSend; i++) {
+            File file = new File(dirSend, listFileSend[i]);
+            if (file.exists()) {
+                System.out.println("... Subiendo ENVIO ..." + file.getName());
+                String ruc = file.getName().substring(0, 8);
+                String tipo = file.getName().substring(9, 11);
+                String serie = file.getName().substring(0, 8);
+                String numero = file.getName().substring(0, 8);
+                clsFactura factura1 = new clsFactura("");
+
+                // factura.set
+            }
+        }
+
+        return facturaArray;
     }
 
 }

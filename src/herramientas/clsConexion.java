@@ -41,7 +41,7 @@ public class clsConexion {
             }
 
             varConexion = DriverManager.getConnection(
-                 //   "jdbc:postgresql://" + host + ":" + puerto + "/" + baseDatos + "",
+                    //   "jdbc:postgresql://" + host + ":" + puerto + "/" + baseDatos + "",
                     url,
                     usuario,
                     contraseña);
@@ -86,6 +86,43 @@ public class clsConexion {
         } catch (Exception e) {
             e.printStackTrace();
             //System.out.println("error cerrando conexion");
+        }
+    }
+
+    public static void inicarTransaccion(Connection varConexion) {
+        if (varConexion != null) {
+            try {
+                if (varConexion.getAutoCommit()) {
+                    varConexion.setAutoCommit(false);
+                }
+            } catch (SQLException ex) {
+                String.valueOf(ex.getErrorCode());
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    public static void deshacerTransaccion(Connection varConexion) {
+        if (varConexion != null) {
+            try {
+                varConexion.rollback();
+                varConexion.setAutoCommit(true);
+            } catch (SQLException ex) {
+                String.valueOf(ex.getErrorCode());
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    public static void finalizarTransaccion(Connection varConexion) {
+        if (varConexion != null) {
+            try {
+                varConexion.commit();
+                varConexion.setAutoCommit(true);
+            } catch (SQLException ex) {
+                String.valueOf(ex.getErrorCode());
+                ex.printStackTrace();
+            }
         }
     }
 

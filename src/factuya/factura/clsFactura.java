@@ -61,6 +61,8 @@ public class clsFactura {
     private String detraccionCuenta;
 
     private String regimenCodigo;
+    
+
 
     public Vector<clsFacturaItem> getItems() {
         return Items;

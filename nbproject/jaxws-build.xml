@@ -67,5 +67,22 @@
         <delete dir="${build.generated.dir}/jax-wsCache/billService_2"/>
         <delete dir="${build.generated.sources.dir}/jax-ws/sunat_guia"/>
     </target>
-    <target name="wsimport-client-generate" depends="wsimport-client-billService, wsimport-client-billService_1, wsimport-client-billService_2"/>
+    <target name="wsimport-client-billService_3" depends="wsimport-init">
+        <mkdir dir="${build.generated.dir}/jax-wsCache/billService_3"/>
+        <property name="wsdl-billService_3" location="xml-resources/web-service-references/billService_3/wsdl/e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService.wsdl"/>
+        <wsimport sourcedestdir="${build.generated.dir}/jax-wsCache/billService_3" destdir="${build.generated.dir}/jax-wsCache/billService_3" wsdl="${wsdl-billService_3}" catalog="catalog.xml" encoding="${source.encoding}" extension="true" verbose="true" fork="false" wsdlLocation="https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService?wsdl" xnocompile="true" xendorsed="true" package="sunat_betta">
+            <depends file="${wsdl-billService_3}"/>
+            <produces dir="${build.generated.dir}/jax-wsCache/billService_3"/>
+        </wsimport>
+        <copy todir="${build.generated.sources.dir}/jax-ws">
+            <fileset dir="${build.generated.dir}/jax-wsCache/billService_3">
+                <include name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="wsimport-client-clean-billService_3" depends="-init-project">
+        <delete dir="${build.generated.dir}/jax-wsCache/billService_3"/>
+        <delete dir="${build.generated.sources.dir}/jax-ws/sunat_betta"/>
+    </target>
+    <target name="wsimport-client-generate" depends="wsimport-client-billService, wsimport-client-billService_1, wsimport-client-billService_2, wsimport-client-billService_3"/>
 </project>

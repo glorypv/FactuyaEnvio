@@ -96,15 +96,14 @@ public class clsParametrosFactuya {
     public static String menu = "0";
     public static String detracionCuenta = "";
 
+    public static Boolean subirServidorExterno = false;
     public static String ubicacionServidorExterno = "";
     public static String hostSHExterno = "";
     public static String puertoSHExterno = "";
     public static String usuarioSHExterno = "";
     public static String passwordSHExterno = "";
 
-
 // </editor-fold>
-
     public clsParametrosFactuya(String _empresa, String context) {
         this.empresa = _empresa;
         this.ubicacionContext = context;
@@ -126,7 +125,7 @@ public class clsParametrosFactuya {
 
                 // Convertimos de Node a elemento
                 Element elementoConcepto = (Element) nodoConcepto;
-              //  System.out.println("" + elementoConcepto.getAttribute("name") + "  :  " + elementoConcepto.getAttribute("value"));
+                //  System.out.println("" + elementoConcepto.getAttribute("name") + "  :  " + elementoConcepto.getAttribute("value"));
 
                 if (elementoConcepto.getAttribute("name").equals(empresa + "subirServidor")) {
                     subirServidor = Boolean.valueOf(elementoConcepto.getAttribute("value"));
@@ -233,6 +232,10 @@ public class clsParametrosFactuya {
                     menu = elementoConcepto.getAttribute("value");
                 }
 
+                if (elementoConcepto.getAttribute("name").equals(empresa + "subirServidorExterno")) {
+                    subirServidorExterno = Boolean.valueOf(elementoConcepto.getAttribute("value"));
+                }
+
                 if (elementoConcepto.getAttribute("name").equals(empresa + "ubicacionServidorExterno")) {
                     ubicacionServidorExterno = elementoConcepto.getAttribute("value");
                 }
@@ -268,8 +271,8 @@ public class clsParametrosFactuya {
         }
 
     }
-   
-    public void cargarConexion() {
+
+    public void cargarConexion(String nombreConexion) {
 
         // Generador de constructor de objetos XML
         NodeList nodeListConceptos = cargarDocumento("/Context/Resource");
@@ -286,11 +289,11 @@ public class clsParametrosFactuya {
                 // Convertimos de Node a elemento
                 Element elementoConcepto = (Element) nodoConcepto;
                 System.out.println("" + elementoConcepto.getAttribute("name") + "  :  " + elementoConcepto.getAttribute("url"));
-                
+
                 System.out.println("" + elementoConcepto.getAttribute("name") + "  :  " + elementoConcepto.getAttribute("username"));
                 System.out.println("" + elementoConcepto.getAttribute("name") + "  :  " + elementoConcepto.getAttribute("password"));
 
-                if (elementoConcepto.getAttribute("name").equals("jdbc/pgpool_factuya")) {
+                if (elementoConcepto.getAttribute("name").equals(nombreConexion)) {
                     host = elementoConcepto.getAttribute("url");
                     usuarioBD = elementoConcepto.getAttribute("username");
                     passwordBD = elementoConcepto.getAttribute("password");
@@ -300,8 +303,8 @@ public class clsParametrosFactuya {
         }
 
     }
-    
-     private NodeList cargarDocumento(String expresionConcepto) {
+
+    private NodeList cargarDocumento(String expresionConcepto) {
         NodeList nodeListConceptos = null;
         try {
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -348,6 +351,5 @@ public class clsParametrosFactuya {
             return nodeListConceptos;
         }
     }
-
 
 }

@@ -4,6 +4,8 @@
  */
 package utilitario;
 
+import herramientas.clsConexion;
+import herramientas.clsParametrosFactuya;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -12,6 +14,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
+import java.sql.Connection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -21,6 +26,15 @@ import java.util.zip.ZipInputStream;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JRExporter;
+import net.sf.jasperreports.engine.JRExporterParameter;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.export.JRPdfExporter;
+import net.sf.jasperreports.engine.util.JRLoader;
+import net.sf.jasperreports.engine.util.JRProperties;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -37,7 +51,7 @@ public class Utilitario {
     public static void main(String argv[]) {
 
         try {
-            File fXmlFile = new File("C:/Temp/R-20498455370-01-F003-00056647.xml");
+       /*     File fXmlFile = new File("C:/Temp/R-20498455370-01-F003-00056647.xml");
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
             Document doc = dBuilder.parse(fXmlFile);
@@ -50,6 +64,27 @@ public class Utilitario {
 
              Document doc = dBuilder.parse(fXmlFile);
              */
+            /*
+               
+            nameFormat="20454603479BOL";
+            id=2209;
+            dirDownload="c:/home/TEMP/SUNAT/PDF/";
+            nameFile="20454603479-03-B001-00000001";
+                    ext=".pdf";
+                            ubicacionFormatos="c:/home/cometVentas/";
+                            ubicacionImagenes="c:/home/cometVentas/";*/
+                            
+           
+          /*   String empresa = "20454603479"; //args[0]; ////  "20498596356";
+         /*   clsParametrosFactuya obtenerParametros = new clsParametrosFactuya(empresa, ubicacionContext);
+            obtenerParametros.cargarParametros();
+            obtenerParametros.cargarConexion();
+
+            Connection  conPostgres = clsConexion.obtenerConexion(clsParametrosFactuya.host, clsParametrosFactuya.usuarioBD, clsParametrosFactuya.passwordBD);
+      exportarComprobantePDF("", null,  "", "" ,  "", "", "", conPostgres ) ;
+
+               */     
+                    
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -262,5 +297,42 @@ public class Utilitario {
         }
 
     }
+    
+    
+    public static void exportarComprobantePDF(String nameFormat, Integer id, String dirDownload, String nameFile, String ext, String ubicacionFormatos, String ubicacionImagenes, Connection conPostgres) {
+
+        try {
+            
+   
+            JasperReport report = null;
+            JRProperties.setProperty("net.sf.jasperreports.awt.ignore.missing.font", "true");
+            Map parameters = new HashMap();
+            // report = (JasperReport) JRLoader.loadObject(new File(clsParametrosFactuya.ubicacionFormatos, nameFormat + ".jasper"));
+            report = (JasperReport) JRLoader.loadObjectFromFile(ubicacionFormatos + nameFormat + ".jasper");//"\\home\\cometerp\\COMET\\FORMATO\\20455511641FAC.jasper");
+//
+            parameters.put("par_cvc_id", id);
+            parameters.put("dirimagenes", ubicacionImagenes);
+
+            // parameters.put("v_valorenletra", ValorEnLetras.convertNumberToLetter(Math.abs(Double.valueOf(total)), "SOLES"));
+            JasperPrint print = JasperFillManager.fillReport(report, parameters, conPostgres);
+            JRExporter exporter = new JRPdfExporter();
+            exporter.setParameter(JRExporterParameter.JASPER_PRINT, print);
+            System.out.println(new java.io.File(dirDownload, nameFile + ext));
+
+            exporter.setParameter(JRExporterParameter.OUTPUT_FILE, new java.io.File(dirDownload, nameFile + ext)); // your output goes here
+
+            exporter.exportReport();
+
+        } catch (JRException e) {
+            //   // TODO captura automática generada por el bloque
+            //  JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            // error = e.getMessage();
+            e.printStackTrace();
+        } catch (Exception e) {
+            //  JOptionPane.showMessageDialog(this, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
+    }
+
 
 }

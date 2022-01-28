@@ -8,4 +8,7 @@
     <system systemId="https://e-guiaremision.sunat.gob.pe/ol-ti-itemision-guia-gem/billService?wsdl" uri="xml-resources/web-service-references/billService_2/wsdl/e-guiaremision.sunat.gob.pe/ol-ti-itemision-guia-gem/billService.wsdl"/>
     <system systemId="https://e-guiaremision.sunat.gob.pe/ol-ti-itemision-guia-gem/billService?ns1.wsdl" uri="xml-resources/web-service-references/billService_2/wsdl/e-guiaremision.sunat.gob.pe/ol-ti-itemision-guia-gem/billService.ns1.wsdl"/>
     <system systemId="https://e-guiaremision.sunat.gob.pe/ol-ti-itemision-guia-gem/billService.xsd2.xsd" uri="xml-resources/web-service-references/billService_2/wsdl/e-guiaremision.sunat.gob.pe/ol-ti-itemision-guia-gem/billService.xsd2.xsd"/>
+    <system systemId="https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService?wsdl" uri="xml-resources/web-service-references/billService_3/wsdl/e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService.wsdl"/>
+    <system systemId="https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService?ns1.wsdl" uri="xml-resources/web-service-references/billService_3/wsdl/e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService.ns1.wsdl"/>
+    <system systemId="https://e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService.xsd2.xsd" uri="xml-resources/web-service-references/billService_3/wsdl/e-beta.sunat.gob.pe/ol-ti-itcpfegem-beta/billService.xsd2.xsd"/>
 </catalog>
