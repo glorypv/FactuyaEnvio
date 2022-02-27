@@ -7,7 +7,7 @@
  *                   
  * Created on 27/01/2011, 12:20:52 PM
  */
-package utilitario;
+package factuyaenvio.utilitario;
 
 import com.jcraft.jsch.*;
 import factuya.factura.clsFactura;
@@ -27,11 +27,11 @@ public class DownloadAndUpload {
     private static String host = "";
     private static Integer port = null;
     private static String pass = "";
-    public String msj = "";
     private static Session session;
     private static Channel channel;
 
     public String beginSFP(String host, String puerto, String usuario, String contraseña) {
+        String msj = "";
         try {
             this.host = host;
             this.port = Integer.parseInt(puerto);
@@ -53,7 +53,7 @@ public class DownloadAndUpload {
                 channel = session.openChannel("sftp");
                 if (channel != null) {
 
-                    msj = "\n ... CONECTAR A SERVIDOR ... \n";
+                    msj = "\n ... CONECTANDO A SERVIDOR ... \n";
                     channel.connect();
                 }
             }
@@ -73,6 +73,7 @@ public class DownloadAndUpload {
     }
 
     public String endSFP() {
+        String msj = "";
         if (channel != null) {
             channel.disconnect();
             session.disconnect();
@@ -82,6 +83,7 @@ public class DownloadAndUpload {
     }
 
     public void downloadFileSFP(String dirRemote, String fileRemote, String dirDownload) {
+        String msj = "";
         try {
             ChannelSftp sftp = (ChannelSftp) channel;
 
@@ -106,7 +108,7 @@ public class DownloadAndUpload {
     }
 
     public Boolean moveFile(String nameFile, String dirSendRpta, File dirDownload, String ubicacionServidor) {
-
+        String msj = "";
         String locate = ubicacionServidor;
         File file = new File(locate + dirSendRpta, nameFile);
         System.out.println("Dir Download" + dirDownload);
@@ -141,6 +143,7 @@ public class DownloadAndUpload {
     }
 
     public String uploadSFTPs(String ubicacion, String ubicacionServidor, String ubicacionEnvio, String ubicacionRespuesta) {
+        String msj = "";
         try {
 
             File SunatSend = new File(ubicacion + ubicacionEnvio);
@@ -207,6 +210,7 @@ public class DownloadAndUpload {
     }
 
     public String uploadSFTPs(String ubicacionLocal, String extension, String ubicacionServidor) {
+        String msj = "";
         try {
 
             File sunatUbicacionLocal = new File(ubicacionLocal);
@@ -218,8 +222,7 @@ public class DownloadAndUpload {
 
                 ChannelSftp sftp = (ChannelSftp) channel;
 
-                msj = msj + "\n ... INICIAR SUBIDA A SERVIDOR ... \n";
-
+                //   msj = msj + "\n ... INICIAR SUBIDA A SERVIDOR ... \n";
                 for (int i = 0; i < numFileSend; i++) {
                     File file = new File(dir, listFile[i]);
                     if (file.exists()) {
@@ -227,7 +230,7 @@ public class DownloadAndUpload {
                         System.out.println(ubicacionServidor);
                         sftp.put(dir + "/" + file.getName(), ubicacionServidor + file.getName());
                         System.out.println("... Subiendo ENVIO ..." + file.getName());
-                        msj = msj + "... Subiendo ENVIO ..." + file.getName() + "\n";
+                        msj = msj + "... Subiendo  ..." + file.getName() + "\n";
                         File filen = new File(dir, file.getName());
                         if (filen.exists()) {
                             filen.delete();
@@ -237,8 +240,7 @@ public class DownloadAndUpload {
                     }
                 }
 
-                msj = msj + "\n... FINALIZAR SUBIDA A SERVIDOR ... \n";
-
+                //  msj = msj + "\n... FINALIZAR SUBIDA A SERVIDOR ... \n";
             }
         } catch (SftpException ex) {
             msj = msj + "Error  " + ex.getMessage() + "\n";
@@ -249,6 +251,7 @@ public class DownloadAndUpload {
     }
 
     public ArrayList leerArchivosCarpeta(String ubicacion, String ubicacionSunat) {
+        String msj = "";
         File archivoSunat = new File(ubicacion + ubicacionSunat);
         ArrayList<clsFactura> facturaArray = new ArrayList<clsFactura>();
         String dirSend = archivoSunat.getPath();

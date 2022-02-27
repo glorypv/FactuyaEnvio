@@ -4,7 +4,6 @@
  */
 package guiaremision.main;
 
-import static factuya.main.clsEnvioFactuya.mensaje;
 import guiaremision.guiaremision.clsComunicacionBaja;
 import guiaremision.guiaremision.clsComunicacionBajaItem;
 import guiaremision.guiaremision.clsGuia;
@@ -13,8 +12,9 @@ import guiaremision.ubl.clsFirmarUBL;
 import guiaremision.ubl.clsGenerarUBLComunicacionBaja;
 import guiaremision.ubl.clsGenerarUBLGuia;
 import guiaremision.webservice.clsEnvioGuiaCPE;
-import herramientas.clsComprimirUBL;
-import herramientas.clsConexion;
+import factuyaenvio.herramientas.clsComprimirUBL;
+import factuyaenvio.herramientas.clsConexion;
+import factuyaenvio.herramientas.clsParametrosFactuya;
 import java.io.File;
 import java.sql.Array;
 import java.sql.CallableStatement;
@@ -23,7 +23,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Vector;
-import utilitario.Utilitario;
+import factuyaenvio.utilitario.Utilitario;
 
 /**
  *
@@ -42,7 +42,6 @@ public class clsEnvioGuiaRemision {
     private static String usuario;
     private static String fechaBaja;
     private static String tipoEnvio;
-    public static String message = "";
     private static String fecha;
     private static Integer bloque;
 
@@ -65,7 +64,56 @@ public class clsEnvioGuiaRemision {
     private static String nombreEsquema = "";
     private static String detracionCuenta = "";
     private static ArrayList idComprobantes = null;
+    
+    public static String mensaje = "";
 
+    public static void main(String[] args) {
+        try {
+            String empresa = args[0]; ////  "20498596356";
+              String ubicacionContext = Utilitario.ubicacionProyecto() + "/META-INF/context.xml";//"C:\\Program Files\\Apache Software Foundation\\Apache Tomcat 7.0.34\\webapps\\Factuya"
+
+           // String empresa = "20603132271"; //args[0]; ////  "20498596356";
+         //   String ubicacionContext = "C:\\Program Files\\Apache Software Foundation\\Apache Tomcat 7.0.34\\webapps\\Factuya" /*Utilitario.ubicacionProyecto() */ + "/META-INF/context.xml";//"C:\\Program Files\\Apache Software Foundation\\Apache Tomcat 7.0.34\\webapps\\Factuya"
+            clsParametrosFactuya obtenerParametros = new clsParametrosFactuya(empresa, ubicacionContext);
+            obtenerParametros.cargarParametros();
+            obtenerParametros.cargarConexion("jdbc/pgpool_factuya");
+
+            conPostgres = clsConexion.obtenerConexion(clsParametrosFactuya.host, clsParametrosFactuya.usuarioBD, clsParametrosFactuya.passwordBD);
+
+            clsEnvioGuiaRemision enviar = new clsEnvioGuiaRemision(
+                    clsParametrosFactuya.numerRUC,//"20498596356",
+                    "T001",//"B001",
+                    "794",//"12041",
+                    null,// ARRARY ID
+                    "admin",//"admin",
+                    clsParametrosFactuya.enviarSUNAT,// 0,
+                    clsParametrosFactuya.enviarResumenDiario,//false,
+                    clsParametrosFactuya.ubicacionCertificado,//"C:\\HOME\\LLAVE",
+                    clsParametrosFactuya.nombreCertificado,// "certificado_chivay.pfx",
+                    clsParametrosFactuya.passwordCertificado,// "chivaycomet2021",
+                    clsParametrosFactuya.usuarioSol,// "20498596356C0M3TCP3",
+                    clsParametrosFactuya.passwordSol,//"C0M3T007",
+                    clsParametrosFactuya.subirServidor,// false,
+                    clsParametrosFactuya.ubicacionPrincipal,// "C:\\HOME\\",
+                    clsParametrosFactuya.ubicacionServidor,// "C:\\HOME\\",
+                    clsParametrosFactuya.ubicacionSunatEnvio,// "\\SUNAT\\ENVIO\\",
+                    clsParametrosFactuya.ubicacionSunatRespuesta,//  "\\SUNAT\\\\RPTA\\",
+                    clsParametrosFactuya.nombreEsquema,
+                    clsParametrosFactuya.detracionCuenta,
+                    conPostgres
+            );
+
+            enviarUnaGuia();
+           // enviar.enviarFacturasPendientes(clsParametrosFactuya.numerRUC);
+
+        } finally {
+            clsConexion.cerrarConexion(conPostgres);
+
+        }
+    }
+
+
+    // <editor-fold defaultstate="collapsed" desc="clsEnvioGuiaRemision">
     public clsEnvioGuiaRemision(String _ruc, String _serie, String _numero, ArrayList idComprobantes, String _usuario,
             Integer enviarSUNAT,
             Boolean enviarResumenDiario,
@@ -109,21 +157,22 @@ public class clsEnvioGuiaRemision {
 
     }
 
-  
+    // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="enviarUnaGuia">
     public static String enviarUnaGuia() {
         if (conPostgres == null) {
             mensaje = mensaje + "\n...No existe conexion a DB ...";
             return mensaje;
         }
         try {
-            message = message + "\n... Generando ..." + ruc + " " + serie + "-" + numero + " \n";
+            mensaje = mensaje + "\n... Generando ..." + ruc + " " + serie + "-" + numero + " \n";
             clsGenerarUBLGuia guia = new clsGenerarUBLGuia(cargarGuia(ruc, serie, numero));
             byte[] escribirXML = guia.escribirXMLByte();
 
             byte[] firmarXML = firmarByteCPE(escribirXML);
             clsEnvioGuiaRemision.enviarCPE("invoice", firmarXML, null, null);
-            message = message + "\n";
+            mensaje = mensaje + "\n";
 
         } catch (Exception ex) {
             mensaje = mensaje + "... Error " + ex.getMessage() + "...\n";
@@ -133,41 +182,40 @@ public class clsEnvioGuiaRemision {
         }
     }
 
-    public clsEnvioGuiaRemision(String ruc, String range, String number) {
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="enviarGuiaResumenDiarioComunicacionBaja">
+    public static String enviarGuiaResumenDiarioComunicacionBaja() {
 
-        conPostgres = clsConexion.obtenerConexion();
-
-        //Envio 1 factura
-        this.ruc = ruc;
-        this.serie = range;
-        this.numero = number;
-        message = message + "\n... Generando ..." + ruc + " " + range + "-" + number + " \n";
-//        progress(message);
-        clsGenerarUBLGuia guia = new clsGenerarUBLGuia(cargarGuia(ruc, range, number));
-        byte[] escribirXML = guia.escribirXMLByte();
-        // CompressUBL compress = new CompressUBL();
-        // compress.compressXMLByte(escribirXML, nameFileXML + ".xml", new File("C:\\temp", "AA.zip"));
-
-        byte[] firmarXML = firmarByteCPE(escribirXML);
-        clsEnvioGuiaRemision.enviarCPE("invoice", firmarXML, null, null);
-        message = message + "\n";
-
-        clsConexion.cerrarConexion(conPostgres);
-    }
-
-    public clsEnvioGuiaRemision(String ruc, ArrayList id) {
         try {
-            this.ruc = ruc;
-            if (id != null) {
+            if (idComprobantes != null) {
                 conPostgres = clsConexion.obtenerConexion();
-                Array resultArr = conPostgres.createArrayOf("int8", id.toArray());
+                Array resultArr = conPostgres.createArrayOf("int8", idComprobantes.toArray());
                 enviarResumen(ruc, resultArr);
                 clsConexion.cerrarConexion(conPostgres);
             }
         } catch (SQLException ex) {
-            message = message + "... Error " + ex.getMessage() + "...\n";
+            mensaje = mensaje + "... Error " + ex.getMessage() + "...\n";
+        }
+
+        try {
+            Array resultArr = conPostgres.createArrayOf("int8", idComprobantes.toArray());
+
+            if (resultArr != null) {
+
+                enviarResumen(ruc, resultArr);
+            }
+
+        } catch (SQLException ex) {
+            mensaje = mensaje + "... Error " + ex.getMessage() + "...\n";
+        } finally {
+            clsConexion.cerrarConexion(conPostgres);
+            return mensaje;
         }
     }
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="firmarByteCPE">
 
     private static byte[] firmarByteCPE(byte[] writeXML) {
         clsFirmarUBL sign = new clsFirmarUBL();
@@ -177,12 +225,14 @@ public class clsEnvioGuiaRemision {
 
         } catch (Exception e) {
 
-            message = message + "... Error " + e.getMessage() + "...\n";
+            mensaje = mensaje + "... Error " + e.getMessage() + "...\n";
 
         }
         return sign.outputXMLByte();
     }
-
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="enviarCPE">
     private static void enviarCPE(String type, byte[] signXML, String classification, Integer block) {
         String nameFileZip = nameFileXML + ".zip";
         String nameFileZipAnswer = nameFileXML + "-R.zip";
@@ -193,20 +243,22 @@ public class clsEnvioGuiaRemision {
         clsComprimirUBL compress = new clsComprimirUBL();
         compress.comprimirXMLByte(signXML, nameFileXML + ".xml", new File(pathZip, nameFileZip));
 
-        clsEnvioGuiaCPE cpe = new clsEnvioGuiaCPE(usuarioSol, passwordSol, conPostgres);
+        clsEnvioGuiaCPE cpe = new clsEnvioGuiaCPE(usuarioSol, passwordSol,enviarResumenDiario,nombreEsquema, conPostgres);
         if (type.equals("invoice")) {
-            message = mensaje + "... Enviando ..." + nameFileZip + " \n";
+            mensaje = mensaje + "... Enviando ..." + nameFileZip + " \n";
             String answercode = cpe.sendInvoice(new File(pathZip, nameFileZip), new File(pathZipAnwser, nameFileZipAnswer), ruc, serie, numero, usuario);
-            message = mensaje + "... Respuesta ..." + nameFileZip + " \n" + answercode + " \n";
+            mensaje = mensaje + "... Respuesta ..." + nameFileZip + " \n" + answercode + " \n";
 
         } else {
-            message = mensaje + "... Enviando ..." + nameFileZip + " \n";
+            mensaje = mensaje + "... Enviando ..." + nameFileZip + " \n";
             String answercode = cpe.sendSummary(type, classification, block, new File(pathZip, nameFileZip), pathZipAnwser, nameFileZipAnswer, ruc, fecha, usuario);
-            message = mensaje + "... Respuesta ..." + nameFileZip + " " + answercode + " \n";
+            mensaje = mensaje + "... Respuesta ..." + nameFileZip + " " + answercode + " \n";
 
         }
     }
-
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="enviarCPE">
     private static void enviarCPE() {
         String nameFileZip = nameFileXML + ".zip";
         String nameFileZipAnswer = nameFileXML + "-R.zip";
@@ -217,7 +269,9 @@ public class clsEnvioGuiaRemision {
         cpe.sendInvoice(new File(pathZip, nameFileZip), new File(pathZipAnwser, nameFileZipAnswer), ruc, serie, numero, usuario);
 
     }
+    // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="cargarGuia">
     private static clsGuia cargarGuia(String empresa, String serie, String numero) {
         Boolean flag = true;
         clsGuia guia = null;
@@ -301,16 +355,18 @@ public class clsEnvioGuiaRemision {
                 }
             }
         } catch (SQLException e) {
-            message = message + "... Error SQL " + e.getMessage() + "...\n";
+            mensaje = mensaje + "... Error SQL " + e.getMessage() + "...\n";
             //progress(message);
         } catch (Exception e) {
             e.printStackTrace();
-            message = message + "... Error " + e.getMessage() + "...\n";
+            mensaje = mensaje + "... Error " + e.getMessage() + "...\n";
             // progress(message);
         }
         return guia;
     }
+    // </editor-fold>
 
+    // <editor-fold defaultstate="collapsed" desc="clsComunicacionBaja">
     private static clsComunicacionBaja loadVoided(String empresa, String fecha, Array id) {
         clsComunicacionBaja voided = new clsComunicacionBaja();
         Boolean flag = true;
@@ -356,17 +412,19 @@ public class clsEnvioGuiaRemision {
             }
             rs.close();
         } catch (SQLException e) {
-            message = message + "... Error SQL " + e.getMessage() + "...\n";
+            mensaje = mensaje + "... Error SQL " + e.getMessage() + "...\n";
             //   progress(message);
         } catch (Exception e) {
             e.printStackTrace();
-            message = message + "... Error " + e.getMessage() + "...\n";
+            mensaje = mensaje + "... Error " + e.getMessage() + "...\n";
             //progress(message);
         }
         return voided;
 
     }
-
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="enviarResumen">
     private static void enviarResumen(String empresa, Array id) {
         try {
             // Enviar todo
@@ -381,7 +439,7 @@ public class clsEnvioGuiaRemision {
                     + ")";
 
             System.out.println(sql);
-            message = message + "\n... Inicio Comunicacion de Baja ...\n";
+            mensaje = mensaje + "\n... Inicio Comunicacion de Baja ...\n";
             // progress(message);
             callsec = conPostgres.prepareCall(sql);
             if (callsec.execute()) {
@@ -428,23 +486,25 @@ public class clsEnvioGuiaRemision {
                     }
                 }
             }
-            message = message + "\n...  Fin Resumen Diario y Comunicacion de Baja ...\n";
+            mensaje = mensaje + "\n...  Fin Resumen Diario y Comunicacion de Baja ...\n";
             //progress(message);
             clsConexion.cerrarConexion(con);
 
         } catch (SQLException ex) {
             System.out.println("SQL E " + ex.getSQLState());
             ex.printStackTrace();
-            message = message + "... Error SQL " + ex.getMessage() + "...\n";
+            mensaje = mensaje + "... Error SQL " + ex.getMessage() + "...\n";
             // progress(message);
         } catch (Exception ex) {
             System.out.println("E " + ex.getMessage());
             ex.printStackTrace();
-            message = message + "... Error " + ex.getMessage() + "...\n";
+            mensaje = mensaje + "... Error " + ex.getMessage() + "...\n";
             // progress(message);
         }
     }
-
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="seeMissingInvoice">
     private static void seeMissingInvoice(String empresa) {
         try {
             // Enviar todo
@@ -508,15 +568,17 @@ public class clsEnvioGuiaRemision {
 
             clsConexion.cerrarConexion(con);
         } catch (SQLException e) {
-            message = message + "... Error SQL " + e.getMessage() + "...\n";
+            mensaje = mensaje + "... Error SQL " + e.getMessage() + "...\n";
             // progress(message);
         } catch (Exception e) {
             e.printStackTrace();
-            message = message + "... Error " + e.getMessage() + "...\n";
+            mensaje = mensaje + "... Error " + e.getMessage() + "...\n";
             //  progress(message);
         }
     }
-
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="seeMissingTicket">
     public static void seeMissingTicket(String empresa) {
         try {
             // Enviar todo
@@ -545,18 +607,20 @@ public class clsEnvioGuiaRemision {
             clsConexion.cerrarConexion(con);
         } catch (SQLException e) {
             e.printStackTrace();
-            message = message + "... Error SQL " + e.getMessage() + "...\n";
+            mensaje = mensaje + "... Error SQL " + e.getMessage() + "...\n";
             //  progress(message);
         } catch (Exception e) {
             e.printStackTrace();
             e.printStackTrace();
-            message = message + "... Error " + e.getMessage() + "...\n";
+            mensaje = mensaje + "... Error " + e.getMessage() + "...\n";
             // progress(message);
         }
     }
-
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="seeMissing">
     public static void seeMissing(String empresa, String tipo, String serie, String numero) {
-        try {
+      /*  try {
             ruc = empresa;
             if (tipo.equals("-")) { // enviar 1 a 1
                 new clsEnvioGuiaRemision(empresa, serie, numero);
@@ -573,14 +637,13 @@ public class clsEnvioGuiaRemision {
         } catch (Exception ex) {
             System.out.println(" " + ex);
             ex.printStackTrace();
-            /*  if (Profile.getInstance().getSendType()) {
-             finishPG(conPostgres);
-             System.exit(0);
-             }*/
-        }
+           
+        }*/
 
     }
-
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="updateFreeTicket">
     public static void updateFreeTicket(String empresa, Array id, String rpta) {
         try {
 
@@ -595,18 +658,20 @@ public class clsEnvioGuiaRemision {
             call.execute();
             call.close();
             if (rpta != null) {
-                message = message + "\n... Comprobante(s) ya informado(s) ...  \n";
+                mensaje = mensaje + "\n... Comprobante(s) ya informado(s) ...  \n";
             }
         } catch (SQLException e) {
 
             e.printStackTrace();
-            message = message + "... Error SQL " + e.getMessage() + "...\n";
+            mensaje = mensaje + "... Error SQL " + e.getMessage() + "...\n";
         } catch (Exception e) {
             e.printStackTrace();
-            message = message + "... Error " + e.getMessage() + "...\n";
+            mensaje = mensaje + "... Error " + e.getMessage() + "...\n";
         }
     }
-
+    // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="updateVoided">
     public static void updateVoided(String empresa, String range, String number, Integer id) {
         try {
             ArrayList<Integer> i = new ArrayList();
@@ -616,13 +681,14 @@ public class clsEnvioGuiaRemision {
             clsEnvioGuiaCPE.updateCPE(empresa, range, number, "", "PEN", "", "NOW()", "SISTEMA", "COMPROBANTEANULADO.zip", "NOW()", "SISTEMA", "");
             updateFreeTicket(empresa, resultArr, "'Comprobante Anulado'");// liberar anulados o resumen para volver a enviar
 
-            message = message + "\n ...Comprobante Anulado  ... " + range + "-" + number + " \n";
+            mensaje = mensaje + "\n ...Comprobante Anulado  ... " + range + "-" + number + " \n";
 
             // updateCPE(ruc, serie, numero, "", state, "", "", "", answerFile.getName(), "NOW()", "SISTEMA", errDesc);
         } catch (Exception e) {
             e.printStackTrace();
-            message = message + "... Error " + e.getMessage() + "...\n";
+            mensaje = mensaje + "... Error " + e.getMessage() + "...\n";
         }
     }
+    // </editor-fold>
 
 }

@@ -17,7 +17,7 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import herramientas.clsComprimirUBL;
+import factuyaenvio.herramientas.clsComprimirUBL;
 import factuya.ubl.clsGenerarUBLFactura;
 import factuya.ubl.clsFirmarUBL;
 import factuya.ubl.clsGenerarUBLComunicacionBaja;
@@ -25,12 +25,12 @@ import factuya.ubl.clsGenerarUBLResumenDiario;
 import factuya.webservice.beta.clsEnvioCPEBeta;
 import factuya.webservice.clsEnvioCPE;
 import factuya.webservice.ose.clsEnvioCPEOSE;
-import herramientas.clsConexion;
-import herramientas.clsParametrosFactuya;
-import herramientas.clsSubidaServidorExterno;
+import factuyaenvio.herramientas.clsConexion;
+import factuyaenvio.herramientas.clsParametrosFactuya;
+import factuyaenvio.herramientas.clsSubidaServidorExterno;
 import java.util.ArrayList;
 import java.util.Vector;
-import utilitario.Utilitario;
+import factuyaenvio.utilitario.Utilitario;
 
 /**
  *
@@ -68,9 +68,11 @@ public class clsEnvioFactuya {
     private static String ubicacionSunatEnvio;
     private static String ubicacionServidor;
     private static String ubicacionSunatRespuesta;
+    private static String ubicacionSunatTemporal;
 
     private static Integer enviarSUNAT = null;
     private static String nombreEsquema = "";
+    private static String nombreEsquemaCPE = "";
     private static String detracionCuenta = "";
     private static ArrayList idComprobantes = null;
 
@@ -91,22 +93,26 @@ public class clsEnvioFactuya {
 
     public static void main(String[] args) {
         try {
-            String empresa = "20454603479"; //args[0]; ////  "20498596356";
+          //    String empresa = args[0]; ////  "20498596356";
+          //  String ubicacionContext = Utilitario.ubicacionProyecto() + "/META-INF/context.xml";//"C:\\Program Files\\Apache Software Foundation\\Apache Tomcat 7.0.34\\webapps\\Factuya"
+
+            String empresa = "20600850246"; //args[0]; ////  "20498596356";
             String ubicacionContext = "C:\\Program Files\\Apache Software Foundation\\Apache Tomcat 7.0.34\\webapps\\Factuya" /*Utilitario.ubicacionProyecto() */ + "/META-INF/context.xml";//"C:\\Program Files\\Apache Software Foundation\\Apache Tomcat 7.0.34\\webapps\\Factuya"
             clsParametrosFactuya obtenerParametros = new clsParametrosFactuya(empresa, ubicacionContext);
             obtenerParametros.cargarParametros();
-            obtenerParametros.cargarConexion("jdbc/pgpool_factuya");
-
-            conPostgres = clsConexion.obtenerConexion(clsParametrosFactuya.host, clsParametrosFactuya.usuarioBD, clsParametrosFactuya.passwordBD);
 
             if (clsParametrosFactuya.subirServidorExterno) {
                 obtenerParametros.cargarConexion("jdbc/pgpool_factuya_servidor_externo");
                 conPostgresExterno = clsConexion.obtenerConexion(clsParametrosFactuya.host, clsParametrosFactuya.usuarioBD, clsParametrosFactuya.passwordBD);
             }
+            
+            obtenerParametros.cargarConexion("jdbc/pgpool_factuya");
+            conPostgres = clsConexion.obtenerConexion(clsParametrosFactuya.host, clsParametrosFactuya.usuarioBD, clsParametrosFactuya.passwordBD);
+
             clsEnvioFactuya enviar = new clsEnvioFactuya(
                     clsParametrosFactuya.numerRUC,//"20498596356",
-                    "B001",//"B001",
-                    "1",//"12041",
+                    null,//"B001",
+                    null,//"12041",
                     null,// ARRARY ID
                     "admin",//"admin",
                     clsParametrosFactuya.enviarSUNAT,// 0,
@@ -121,7 +127,9 @@ public class clsEnvioFactuya {
                     clsParametrosFactuya.ubicacionServidor,// "C:\\HOME\\",
                     clsParametrosFactuya.ubicacionSunatEnvio,// "\\SUNAT\\ENVIO\\",
                     clsParametrosFactuya.ubicacionSunatRespuesta,//  "\\SUNAT\\\\RPTA\\",
+                    clsParametrosFactuya.ubicacionSunatTemporal,//  "\\SUNAT\\\\RPTA\\",
                     clsParametrosFactuya.nombreEsquema,
+                    clsParametrosFactuya.nombreEsquemaCPE,
                     clsParametrosFactuya.detracionCuenta,
                     clsParametrosFactuya.subirServidorExterno,
                     clsParametrosFactuya.ubicacionServidorExterno,
@@ -135,8 +143,18 @@ public class clsEnvioFactuya {
                     conPostgresExterno
             );
 
-            enviarUnaFactura();
-            // enviar.enviarFacturasPendientes(clsParametrosFactuya.numerRUC);
+            // enviarUnaFactura();
+            enviar.enviarFacturasPendientes(clsParametrosFactuya.numerRUC);
+
+            if (clsParametrosFactuya.subirServidorExterno) {
+                String ubicacionServidorExternoTemp = clsParametrosFactuya.ubicacionPrincipal + clsParametrosFactuya.ubicacionSunatTemporal + usuario;
+                clsSubidaServidorExterno subirServidorExterno = new clsSubidaServidorExterno(ubicacionServidorExternoTemp, clsParametrosFactuya.numerRUC, usuario, nombreEsquema, nombreEsquemaCPE, conPostgres, conPostgresExterno);
+                subirServidorExterno.insertarServidorExterno();
+                subirServidorExterno.subirServidorExteno(clsParametrosFactuya.hostSHExterno, clsParametrosFactuya.puertoSHExterno, clsParametrosFactuya.usuarioSHExterno, clsParametrosFactuya.passwordSHExterno, clsParametrosFactuya.ubicacionServidorExterno);
+
+                System.out.println(subirServidorExterno.mensaje);
+            }
+
         } finally {
             clsConexion.cerrarConexion(conPostgres);
             if (clsParametrosFactuya.subirServidorExterno) {
@@ -146,7 +164,7 @@ public class clsEnvioFactuya {
     }
 
     // <editor-fold defaultstate="collapsed" desc="clsEnvioFactuya constructor">
-    public clsEnvioFactuya(String _ruc, String _serie, String _numero, ArrayList idComprobantes, String _usuario, Integer enviarSUNAT, Boolean enviarResumenDiario, String ubicacionCertificado, String nombreCertificado, String passwordCertificado, String usuarioSol, String passwordSol, Boolean subirServidor, String ubicacionPrincipal, String ubicacionServidor, String ubicacionSunatEnvio, String ubicacionSunatRespuesta, String nombreEsquema, String detracionCuenta,
+    public clsEnvioFactuya(String _ruc, String _serie, String _numero, ArrayList idComprobantes, String _usuario, Integer enviarSUNAT, Boolean enviarResumenDiario, String ubicacionCertificado, String nombreCertificado, String passwordCertificado, String usuarioSol, String passwordSol, Boolean subirServidor, String ubicacionPrincipal, String ubicacionServidor, String ubicacionSunatEnvio, String ubicacionSunatRespuesta, String ubicacionSunatTemporal, String nombreEsquema, String nombreEsquemaCPE, String detracionCuenta,
             Boolean subirServidorExterno,
             String ubicacionServidorExterno,
             String hostSHExterno,
@@ -174,7 +192,9 @@ public class clsEnvioFactuya {
         this.ubicacionSunatEnvio = ubicacionSunatEnvio;
         this.ubicacionServidor = ubicacionServidor;
         this.ubicacionSunatRespuesta = ubicacionSunatRespuesta;
+        this.ubicacionSunatTemporal = ubicacionSunatTemporal;
         this.nombreEsquema = nombreEsquema;
+        this.nombreEsquemaCPE = nombreEsquemaCPE;
         this.detracionCuenta = detracionCuenta;
         this.conPostgres = conx;
         this.conPostgresExterno = conPostgresExterno;
@@ -349,6 +369,8 @@ public class clsEnvioFactuya {
             sql = "SELECT * FROM " + nombreEsquema + ".fun_fel_consulta_facturacionelectronica_pendiente ("
                     + "'" + empresa + "',"
                     + tipo + ")";
+
+            System.out.println(sql);
             callsec = con.prepareCall(sql);
             if (callsec.execute()) {
                 rssec = callsec.getResultSet();
@@ -357,7 +379,7 @@ public class clsEnvioFactuya {
                         serie = rssec.getString("serie");
                         numero = rssec.getString("numero");
                         ruc = rssec.getString("ruc");
-                        usuario = "admin";//rssec.getString("usuario");
+                        // usuario = "admin";//rssec.getString("usuario");
                         String rpta = "-1";
                         // FALTA
                         File file = new File(ubicacionServidor + rssec.getString("nombrearchivo") + ".zip");
@@ -366,7 +388,6 @@ public class clsEnvioFactuya {
                             File filerpta = new File(ubicacionServidor + rssec.getString("nombrearchivo") + "-R.zip");
                             if (filerpta.exists()) {
                                 rpta = Utilitario.searchAnswer(ubicacionServidor, rssec.getString("nombrearchivo") + "-R.zip", "cbc:ResponseCode");
-
                             }
                         }
                         if (!rpta.equals("0")) {// archivo de respuesta diferente de aceptado
@@ -489,38 +510,24 @@ public class clsEnvioFactuya {
                 mensaje = mensaje + "... Respuesta ..." + nombreArchivoZip + " " + codigoRespuesta + " \n";
                 // progress(mensaje);
             }
-            if (subirServidorExterno) {
-                clsSubidaServidorExterno subidaServidorExterno = new clsSubidaServidorExterno(nombreArchivoXML, idComprobante, tipoComprobante, conPostgres);
-                subidaServidorExterno.crearUbicacion(ubicacionPrincipal);
-                subidaServidorExterno.copiarParaServidorExterno(subirServidor, ubicacionPrincipal, ubicacionServidor, ubicacionSunatEnvio, ubicacionSunatRespuesta, ubicacionFormatos, ubicacionImagenes);
 
-                clsSubidaServidorExterno subirServidorExterno = new clsSubidaServidorExterno(nombreArchivoXML, usuario, conPostgres, conPostgresExterno);
-                subirServidorExterno.subirServidorExteno(hostSHExterno, puertoSHExterno, usuarioSHExterno, passwordSHExterno, ubicacionServidorExterno);
-                subirServidorExterno.insertarServidorExterno();
-                mensaje = mensaje = subirServidorExterno.mensaje;
-            }
-
-            /**
-             * ***************** SUBIR A SERVIDOR EXTERNO
-             * *********************************************************************************
-             */
-            /* new File(ubicacionPrincipal + "/TEMP/").mkdir();
-             new File(ubicacionPrincipal + "/TEMP/SUNAT/").mkdir();
-             new File(ubicacionPrincipal + "/TEMP/SUNAT/ENVIO/").mkdir();
-             new File(ubicacionPrincipal + "/TEMP/SUNAT/RPTA/").mkdir();
-             String ubicacionServidorExternoTemp = ubicacionPrincipal + "/TEMP";
-
-             DownloadAndUpload copiarATemp = new DownloadAndUpload();
-             copiarATemp.copyFile(ubicacionZip + nombreArchivoZip, ubicacionServidorExternoTemp + ubicacionSunatEnvio + nombreArchivoZip);
-             copiarATemp.copyFile(ubicacionZip + nombreArvhicoRespuestaZip, ubicacionServidorExternoTemp + ubicacionSunatRespuesta + nombreArvhicoRespuestaZip);
-
-             mensaje = mensaje + copiarATemp.beginSFP(clsParametrosFactuya.hostSHExterno, clsParametrosFactuya.puertoSHExterno, clsParametrosFactuya.usuarioSHExterno, clsParametrosFactuya.passwordSHExterno);
-             mensaje = mensaje + copiarATemp.uploadSFTPs(ubicacionServidorExternoTemp, clsParametrosFactuya.ubicacionServidorExterno, ubicacionSunatEnvio, ubicacionSunatRespuesta);
-             mensaje = mensaje + copiarATemp.endSFP();*/
-            /**
-             * ***************************************************************************************************************************
-             */
         }
+
+        /**
+         * ***************** SUBIR A SERVIDOR EXTERNO
+         * *********************************************************************************
+         */
+        if (subirServidorExterno) {
+            clsSubidaServidorExterno subidaServidorExterno = new clsSubidaServidorExterno(nombreArchivoXML, ruc, usuario, idComprobante, tipoComprobante, conPostgres);
+            subidaServidorExterno.crearUbicacion(ubicacionPrincipal + ubicacionSunatTemporal);
+            subidaServidorExterno.copiarParaServidorExterno(subirServidor, ubicacionPrincipal, ubicacionServidor, ubicacionSunatEnvio, ubicacionSunatRespuesta, ubicacionFormatos, ubicacionImagenes);
+
+            /* clsSubidaServidorExterno subirServidorExterno = new clsSubidaServidorExterno(nombreArchivoXML, usuario, conPostgres, conPostgresExterno);
+             subirServidorExterno.subirServidorExteno(hostSHExterno, puertoSHExterno, usuarioSHExterno, passwordSHExterno, ubicacionServidorExterno);
+             subirServidorExterno.insertarServidorExterno();
+             mensaje = mensaje = subirServidorExterno.mensaje;*/
+        }
+
     }
         // </editor-fold>
 
@@ -1027,12 +1034,13 @@ public class clsEnvioFactuya {
     // <editor-fold defaultstate="collapsed" desc="actualizarAnulados">
     public static String actualizarAnulados(String empresa, String range, String number, Integer id, String usuario) {
         try {
+
             ArrayList<Integer> i = new ArrayList();
             i.add(id);
 
             Array resultArr = conPostgres.createArrayOf("int8", i.toArray());
 
-            clsEnvioCPE cpe = new clsEnvioCPE(usuarioSol, passwordSol, conPostgres);
+            clsEnvioCPE cpe = new clsEnvioCPE(usuarioSol, passwordSol, enviarResumenDiario, nombreEsquema, conPostgres);//new clsEnvioCPE(usuarioSol, passwordSol, conPostgres);--
             clsEnvioCPE.actualizarCPE(empresa, range, number, "", "ENV", "COMPROBANTEANULADO.zip", "NOW()", usuario, "", "", "", "");
             clsEnvioCPE.actualizarCPE(empresa, range, number, "", "PEN", "", "NOW()", usuario, "COMPROBANTEANULADO.zip", "NOW()", usuario, "");
             liberarTicket(empresa, resultArr, "'Comprobante Anulado'");// liberar anulados o resumen para volver a enviar

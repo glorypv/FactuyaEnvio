@@ -3,7 +3,7 @@ package factuya.factura;
 ;
 
 import java.util.Vector;
-import herramientas.clsConvertirNumeroAletra;
+import factuyaenvio.herramientas.clsConvertirNumeroAletra;
 
 /**
  *

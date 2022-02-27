@@ -2,10 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package utilitario;
+package factuyaenvio.utilitario;
 
-import herramientas.clsConexion;
-import herramientas.clsParametrosFactuya;
+import factuyaenvio.herramientas.clsConexion;
+import factuyaenvio.herramientas.clsParametrosFactuya;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -51,40 +51,38 @@ public class Utilitario {
     public static void main(String argv[]) {
 
         try {
-       /*     File fXmlFile = new File("C:/Temp/R-20498455370-01-F003-00056647.xml");
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc = dBuilder.parse(fXmlFile);
-            System.out.println("rrrr" + findElement(doc, "cbc:ResponseCode"));
-            //optional, but recommended
-            //read this - http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
+            /*     File fXmlFile = new File("C:/Temp/R-20498455370-01-F003-00056647.xml");
+             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+             DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+             Document doc = dBuilder.parse(fXmlFile);
+             System.out.println("rrrr" + findElement(doc, "cbc:ResponseCode"));
+             //optional, but recommended
+             //read this - http://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
 
-            /*          DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance()
+             /*          DocumentBuilder dBuilder = DocumentBuilderFactory.newInstance()
              .newDocumentBuilder();
 
              Document doc = dBuilder.parse(fXmlFile);
              */
             /*
                
-            nameFormat="20454603479BOL";
-            id=2209;
-            dirDownload="c:/home/TEMP/SUNAT/PDF/";
-            nameFile="20454603479-03-B001-00000001";
-                    ext=".pdf";
-                            ubicacionFormatos="c:/home/cometVentas/";
-                            ubicacionImagenes="c:/home/cometVentas/";*/
-                            
-           
-          /*   String empresa = "20454603479"; //args[0]; ////  "20498596356";
-         /*   clsParametrosFactuya obtenerParametros = new clsParametrosFactuya(empresa, ubicacionContext);
-            obtenerParametros.cargarParametros();
-            obtenerParametros.cargarConexion();
+             nameFormat="20454603479BOL";
+             id=2209;
+             dirDownload="c:/home/TEMP/SUNAT/PDF/";
+             nameFile="20454603479-03-B001-00000001";
+             ext=".pdf";
+             ubicacionFormatos="c:/home/cometVentas/";
+             ubicacionImagenes="c:/home/cometVentas/";*/
 
-            Connection  conPostgres = clsConexion.obtenerConexion(clsParametrosFactuya.host, clsParametrosFactuya.usuarioBD, clsParametrosFactuya.passwordBD);
-      exportarComprobantePDF("", null,  "", "" ,  "", "", "", conPostgres ) ;
+            /*   String empresa = "20454603479"; //args[0]; ////  "20498596356";
+             /*   clsParametrosFactuya obtenerParametros = new clsParametrosFactuya(empresa, ubicacionContext);
+             obtenerParametros.cargarParametros();
+             obtenerParametros.cargarConexion();
 
-               */     
-                    
+             Connection  conPostgres = clsConexion.obtenerConexion(clsParametrosFactuya.host, clsParametrosFactuya.usuarioBD, clsParametrosFactuya.passwordBD);
+             exportarComprobantePDF("", null,  "", "" ,  "", "", "", conPostgres ) ;
+
+             */
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -278,9 +276,11 @@ public class Utilitario {
             System.out.println(ruta);
             //   out.println(ruta);
 
+            ruta = ruta.replace("\\", "/");
+            //System.out.println(ruta);
             int a = 0;
             for (int i = 0; i < ruta.length(); i++) {
-                if (ruta.charAt((ruta.length() - 1) - i) == '\\') {
+                if (ruta.charAt((ruta.length() - 1) - i) == '/') {
                     ruta_retur = ruta.substring(0, (ruta.length() - 1) - i);
                     System.out.println(ruta_retur);
                     if (a > 1) {
@@ -297,13 +297,11 @@ public class Utilitario {
         }
 
     }
-    
-    
+
     public static void exportarComprobantePDF(String nameFormat, Integer id, String dirDownload, String nameFile, String ext, String ubicacionFormatos, String ubicacionImagenes, Connection conPostgres) {
 
         try {
-            
-   
+
             JasperReport report = null;
             JRProperties.setProperty("net.sf.jasperreports.awt.ignore.missing.font", "true");
             Map parameters = new HashMap();
@@ -333,6 +331,5 @@ public class Utilitario {
             e.printStackTrace();
         }
     }
-
 
 }

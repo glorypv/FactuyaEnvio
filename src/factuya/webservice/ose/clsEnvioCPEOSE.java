@@ -5,7 +5,7 @@
  */
 package factuya.webservice.ose;
 
-import herramientas.clsConexion;
+import factuyaenvio.herramientas.clsConexion;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -33,7 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.handler.Handler;
-import utilitario.Utilitario;
+import factuyaenvio.utilitario.Utilitario;
 import sunat_ose.StatusResponse;
 
 /**

@@ -4,7 +4,7 @@
  */
 package factuya.webservice.beta;
 
-import herramientas.clsConexion;
+import factuyaenvio.herramientas.clsConexion;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -32,7 +32,7 @@ import javax.xml.xpath.XPathExpressionException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 import java.sql.Connection;
-import utilitario.Utilitario;
+import factuyaenvio.utilitario.Utilitario;
 
 /**
  *

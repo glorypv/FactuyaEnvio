@@ -1,4 +1,4 @@
-package herramientas;
+package factuyaenvio.herramientas;
 
 import java.io.File;
 import java.io.IOException;
@@ -76,10 +76,11 @@ public class clsParametrosFactuya {
     public static String ubicacionPrincipal;
     public static String ubicacionSunatEnvio;
     public static String ubicacionSunatRespuesta;
+    public static String ubicacionSunatTemporal;
 
     public static String nombreEsquema = "ventas";
     public static String nombreTablaComprobantes = "tblcomprobantesventascab_cvc";
-    public static String nombreEsquemeCPE = "ventas";
+    public static String nombreEsquemaCPE = "ventas";
     public static String campoEmpresa = "cvc.emp_id=emp.emp_id";
     public static String campoMoneda = "cvc.mon_codigo";
     public static String campoFechaemision = "cvc_fechaemision";
@@ -221,6 +222,10 @@ public class clsParametrosFactuya {
                     ubicacionSunatRespuesta = elementoConcepto.getAttribute("value");
                 }
 
+                if (elementoConcepto.getAttribute("name").equals(empresa + "ubicacionSunatTemporal")) {
+                    ubicacionSunatTemporal = elementoConcepto.getAttribute("value");
+                }
+
                 if (elementoConcepto.getAttribute("name").equals(empresa + "enviarSUNAT")) {
                     enviarSUNAT = Integer.valueOf(elementoConcepto.getAttribute("value"));
                 }
@@ -256,7 +261,7 @@ public class clsParametrosFactuya {
                 if (cargo) {
                     nombreEsquema = "cargo";
                     nombreTablaComprobantes = "tblcomprobantesventacabecera_cvc";
-                    nombreEsquemeCPE = "public";
+                    nombreEsquemaCPE = "public";
                     campoEmpresa = "cvc.emp_codigo=emp.emp_codigo";;
                     campoMoneda = "'SOL'";
                     campoFechaemision = "cvc_fecemision";
