@@ -55,14 +55,14 @@ public class clsFactura {
     private String Observaciones;
     private String NumeroOrdenCompra;
 
+    private String NumeroGuia;
+      private String TipoDocumentoGuia;
     private String detraccionCod;
     private String detraccionPorc;
     private String detraccionMonto;
     private String detraccionCuenta;
 
     private String regimenCodigo;
-    
-
 
     public Vector<clsFacturaItem> getItems() {
         return Items;
@@ -454,5 +454,23 @@ public class clsFactura {
     public void setRegimenCodigo(String regimenCodigo) {
         this.regimenCodigo = regimenCodigo;
     }
+
+    public String getNumeroGuia() {
+        return NumeroGuia;
+    }
+
+    public void setNumeroGuia(String NumeroGuia) {
+        this.NumeroGuia = NumeroGuia;
+    }
+
+    public String getTipoDocumentoGuia() {
+        return TipoDocumentoGuia;
+    }
+
+    public void setTipoDocumentoGuia(String TipoDocumentoGuia) {
+        this.TipoDocumentoGuia = TipoDocumentoGuia;
+    }
+    
+    
 
 }

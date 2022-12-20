@@ -282,8 +282,9 @@ public class Utilitario {
             for (int i = 0; i < ruta.length(); i++) {
                 if (ruta.charAt((ruta.length() - 1) - i) == '/') {
                     ruta_retur = ruta.substring(0, (ruta.length() - 1) - i);
-                    System.out.println(ruta_retur);
+                    // System.out.println(ruta_retur);
                     if (a > 1) {
+
                         break;
                     }
                     a++;
@@ -293,6 +294,7 @@ public class Utilitario {
         } catch (URISyntaxException ex) {
             Logger.getLogger(Utilitario.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
+            System.out.println(ruta_retur);
             return ruta_retur;
         }
 

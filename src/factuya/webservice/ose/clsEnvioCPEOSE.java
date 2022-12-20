@@ -161,6 +161,17 @@ public class clsEnvioCPEOSE {
                 } else {
                     String state = "ERR";
                     String errDesc = buscarCodigoError(answerCode.replace("Client.", ""));
+                    
+                       if (errDesc == null) {
+                        errDesc = "SIN RPTA WS Obs";
+                       
+                    }
+
+                    if (errDesc.equals("")) {
+                        errDesc = "SIN RPTA WS";
+                    }
+                    
+                    
                     if (Integer.valueOf(answerCode.replace("Client.", "")) >= 2000 && Integer.valueOf(answerCode.replace("Client.", "")) <= 3999) {
                         state = "REC";
                     }
@@ -315,7 +326,7 @@ public class clsEnvioCPEOSE {
         return answerCode;
     }
 
-    public void actualizarResumenDiario(String ruta, String archivo, String ruc, String tipo, String ticket, String fecharecepcion, String usumodificacion, String observacion) {
+    public void actualizarResumenDiario(File  comprobaterespuesta, String ruc, String tipo, String ticket, String fecharecepcion, String usumodificacion, String observacion) {
         try {
             clsConexion.inicarTransaccion();
             String rpta = "";
@@ -325,13 +336,13 @@ public class clsEnvioCPEOSE {
             if (rpta.equals("0") || rpta.equals("99")) {
                 // leer el archivo
                 FileOutputStream fos;
-                fos = new FileOutputStream(ruta + archivo);
+                fos = new FileOutputStream( comprobaterespuesta.getAbsolutePath() );
                 fos.write(getStatus(ticket).getContent());
                 fos.close();
                 Utilitario.contexto = "";
-                String msjRpta = Utilitario.searchAnswer(ruta, archivo, "cbc:Description");
+                String msjRpta = Utilitario.searchAnswer(comprobaterespuesta.getAbsolutePath(), comprobaterespuesta.getName(), "cbc:Description");
                 Utilitario.contexto = "";
-                String codigoRpta = Utilitario.searchAnswer(ruta, archivo, "cbc:ResponseCode");
+                String codigoRpta = Utilitario.searchAnswer(comprobaterespuesta.getAbsolutePath(), comprobaterespuesta.getName(), "cbc:ResponseCode");
                 msjRpta = msjRpta.replace("'", "");
                 String estado = rpta.equals("0") ? "ACE" : "REC";
                 if (rpta.equals("99")) {
@@ -341,7 +352,7 @@ public class clsEnvioCPEOSE {
                         estado = "PEN";
                     }
                 }
-                actualizarTicket(ruc, tipo, "", null, "", ticket, estado, "", "", "", archivo, "NOW()", usumodificacion, codigoRpta + " " + msjRpta);
+                actualizarTicket(ruc, tipo, "", null, "", ticket, estado, "", "", "", comprobaterespuesta.getName(), "NOW()", usumodificacion, codigoRpta + " " + msjRpta);
             }
             if (rpta.equals("0098")) {
                 String estado = "PRO";

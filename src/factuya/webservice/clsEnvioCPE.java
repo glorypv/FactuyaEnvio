@@ -58,8 +58,9 @@ public class clsEnvioCPE {
 
     private static Connection conPostgres = null;
 
-    private static Boolean enviarResumenDiario=false;
-    private static String nombreEsquema="";
+    private static Boolean enviarResumenDiario = false;
+    private static String nombreEsquema = "";
+
     public static void main(String[] args) {
         //  enviarFactura(new File("C:/Temp/", "20498455370-01-F003-00056647.zip"), new File("C:/Temp/", "R-20498455370-01-F003-00056647.zip"));
     }
@@ -69,13 +70,13 @@ public class clsEnvioCPE {
         this.passwordSOL = password;
         this.conPostgres = conx;
     }
-    
-     public clsEnvioCPE(String user, String password, Boolean enviarResumenDiario,String nombreEsquema,Connection conx) {
+
+    public clsEnvioCPE(String user, String password, Boolean enviarResumenDiario, String nombreEsquema, Connection conx) {
         this.userSOL = user;
         this.passwordSOL = password;
         this.conPostgres = conx;
-        this.enviarResumenDiario=enviarResumenDiario;
-        this.nombreEsquema=nombreEsquema;
+        this.enviarResumenDiario = enviarResumenDiario;
+        this.nombreEsquema = nombreEsquema;
     }
 
     public String enviarFactura(File invoiceFile, File answerFile, String ruc, String range, String number, String user) {
@@ -156,6 +157,11 @@ public class clsEnvioCPE {
                     answerCode = answerCode.replace("Client.", "");
                     String state = "ERR";
                     String errDesc = buscarCodigoError(answerCode.replace("Client.", ""));
+                    if (errDesc == null) {
+                        errDesc = "SIN RPTA WS Obs";
+                       
+                    }
+
                     if (errDesc.equals("")) {
                         errDesc = "SIN RPTA WS";
                     }
@@ -309,7 +315,7 @@ public class clsEnvioCPE {
         return answerCode;
     }
 
-    public void actualizarResumenDiario(String ruta, String archivo, String ruc, String tipo, String ticket, String fecharecepcion, String usumodificacion, String observacion) {
+    public void actualizarResumenDiario(File comprobaterespuesta, String ruc, String tipo, String ticket, String fecharecepcion, String usumodificacion, String observacion) {
         try {
             clsConexion.inicarTransaccion();
             String rpta = "";
@@ -319,13 +325,14 @@ public class clsEnvioCPE {
             if (rpta.equals("0") || rpta.equals("99")) {
                 // leer el archivo
                 FileOutputStream fos;
-                fos = new FileOutputStream(ruta + archivo);
+                fos = new FileOutputStream(comprobaterespuesta.getAbsolutePath());
                 fos.write(getStatus(ticket).getContent());
                 fos.close();
                 Utilitario.contexto = "";
-                String msjRpta = Utilitario.searchAnswer(ruta, archivo, "cbc:Description");
+
+                String msjRpta = Utilitario.searchAnswer(comprobaterespuesta.getAbsolutePath(), comprobaterespuesta.getName(), "cbc:Description");
                 Utilitario.contexto = "";
-                String codigoRpta = Utilitario.searchAnswer(ruta, archivo, "cbc:ResponseCode");
+                String codigoRpta = Utilitario.searchAnswer(comprobaterespuesta.getAbsolutePath(), comprobaterespuesta.getName(), "cbc:ResponseCode");
                 msjRpta = msjRpta.replace("'", "");
                 String estado = rpta.equals("0") ? "ACE" : "REC";
                 if (rpta.equals("99")) {
@@ -335,7 +342,7 @@ public class clsEnvioCPE {
                         estado = "PEN";
                     }
                 }
-                actualizarTicket(ruc, tipo, "", null, "", ticket, estado, "", "", "", archivo, "NOW()", usumodificacion, codigoRpta + " " + msjRpta);
+                actualizarTicket(ruc, tipo, "", null, "", ticket, estado, "", "", "", comprobaterespuesta.getName(), "NOW()", usumodificacion, codigoRpta + " " + msjRpta);
             }
             if (rpta.equals("0098")) {
                 String estado = "PRO";
@@ -504,7 +511,46 @@ public class clsEnvioCPE {
         }
         return rpta;
     }
-/*
+    /*
+     private static byte[] sendBill(java.lang.String fileName, javax.activation.DataHandler contentFile, java.lang.String partyType) {
+     sunat.BillService_Service service = new sunat.BillService_Service();
+     sunat.BillService port = service.getBillServicePort();
+
+     BindingProvider bindingProvider = (BindingProvider) port;
+     @SuppressWarnings("request-headers")
+     List<Handler> handlerChain = new ArrayList<Handler>();
+     handlerChain.add(new WSSecurityHeaderSOAPHandler(userSOL, passwordSOL));
+     bindingProvider.getBinding().setHandlerChain(handlerChain);
+
+     return port.sendBill(fileName, contentFile, partyType);
+     }
+
+     private static String sendSummary(java.lang.String fileName, javax.activation.DataHandler contentFile, java.lang.String partyType) {
+     sunat.BillService_Service service = new sunat.BillService_Service();
+     sunat.BillService port = service.getBillServicePort();
+
+     BindingProvider bindingProvider = (BindingProvider) port;
+     @SuppressWarnings("request-headers")
+     List<Handler> handlerChain = new ArrayList<Handler>();
+     handlerChain.add(new WSSecurityHeaderSOAPHandler(userSOL, passwordSOL));
+     bindingProvider.getBinding().setHandlerChain(handlerChain);
+
+     return port.sendSummary(fileName, contentFile, partyType);
+     }
+
+     private static StatusResponse getStatus(java.lang.String ticket) {
+     sunat.BillService_Service service = new sunat.BillService_Service();
+     sunat.BillService port = service.getBillServicePort();
+
+     BindingProvider bindingProvider = (BindingProvider) port;
+     @SuppressWarnings("request-headers")
+     List<Handler> handlerChain = new ArrayList<Handler>();
+     handlerChain.add(new WSSecurityHeaderSOAPHandler(userSOL, passwordSOL));
+     bindingProvider.getBinding().setHandlerChain(handlerChain);
+
+     return port.getStatus(ticket);
+     }*/
+
     private static byte[] sendBill(java.lang.String fileName, javax.activation.DataHandler contentFile, java.lang.String partyType) {
         sunat.BillService_Service service = new sunat.BillService_Service();
         sunat.BillService port = service.getBillServicePort();
@@ -542,50 +588,6 @@ public class clsEnvioCPE {
         bindingProvider.getBinding().setHandlerChain(handlerChain);
 
         return port.getStatus(ticket);
-    }*/
-
-    private static byte[] sendBill(java.lang.String fileName, javax.activation.DataHandler contentFile, java.lang.String partyType) {
-        sunat.BillService_Service service = new sunat.BillService_Service();
-        sunat.BillService port = service.getBillServicePort();
-        
-        
-        BindingProvider bindingProvider = (BindingProvider) port;
-        @SuppressWarnings("request-headers")
-        List<Handler> handlerChain = new ArrayList<Handler>();
-        handlerChain.add(new WSSecurityHeaderSOAPHandler(userSOL, passwordSOL));
-        bindingProvider.getBinding().setHandlerChain(handlerChain);
-        
-        return port.sendBill(fileName, contentFile, partyType);
     }
-
-    private static String sendSummary(java.lang.String fileName, javax.activation.DataHandler contentFile, java.lang.String partyType) {
-        sunat.BillService_Service service = new sunat.BillService_Service();
-        sunat.BillService port = service.getBillServicePort();
-        
-        
-        BindingProvider bindingProvider = (BindingProvider) port;
-        @SuppressWarnings("request-headers")
-        List<Handler> handlerChain = new ArrayList<Handler>();
-        handlerChain.add(new WSSecurityHeaderSOAPHandler(userSOL, passwordSOL));
-        bindingProvider.getBinding().setHandlerChain(handlerChain);
-        
-        return port.sendSummary(fileName, contentFile, partyType);
-    }
-
-    private static StatusResponse getStatus(java.lang.String ticket) {
-        sunat.BillService_Service service = new sunat.BillService_Service();
-        sunat.BillService port = service.getBillServicePort();
-        
-        
-        BindingProvider bindingProvider = (BindingProvider) port;
-        @SuppressWarnings("request-headers")
-        List<Handler> handlerChain = new ArrayList<Handler>();
-        handlerChain.add(new WSSecurityHeaderSOAPHandler(userSOL, passwordSOL));
-        bindingProvider.getBinding().setHandlerChain(handlerChain);
-        
-        return port.getStatus(ticket);
-    }
-    
-    
 
 }

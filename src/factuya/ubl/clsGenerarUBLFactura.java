@@ -142,6 +142,15 @@ public class clsGenerarUBLFactura {
 
                 temp = temp + linea + "\n";
             }
+            if (!factura.getNumeroGuia().equals("")) {
+                linea = "  <cac:DespatchDocumentReference>\n    "
+                        + " <cbc:ID>" + factura.getNumeroGuia() + "</cbc:ID>\n  "
+                        + " <cbc:DocumentTypeCode>" + factura.getTipoDocumentoGuia() + "</cbc:DocumentTypeCode>\n  "
+                        + " </cac:DespatchDocumentReference>\n";
+
+                temp = temp + linea + "\n";
+
+            }
 
             //Identificador de la Firma
             linea = "  <cac:Signature>\n"
@@ -430,10 +439,10 @@ public class clsGenerarUBLFactura {
 
             linea = "</" + etiquetaCabecera + ">";
             temp = temp + (linea + "\n");
-
+            System.out.println("GENERO UBL CORRECTAMENTE");
         } catch (Exception e) {
             temp = "";
-            System.out.println(e.getMessage());
+            System.out.println("ERROR UBL" + e.getMessage());
             e.printStackTrace();
         }
         return temp.getBytes();

@@ -70,7 +70,7 @@ public class clsEnvioGuiaRemision {
     public static void main(String[] args) {
         try {
             String empresa = args[0]; ////  "20498596356";
-              String ubicacionContext = Utilitario.ubicacionProyecto() + "/META-INF/context.xml";//"C:\\Program Files\\Apache Software Foundation\\Apache Tomcat 7.0.34\\webapps\\Factuya"
+            String ubicacionContext = Utilitario.ubicacionProyecto() + "/META-INF/context.xml";//"C:\\Program Files\\Apache Software Foundation\\Apache Tomcat 7.0.34\\webapps\\Factuya"
 
            // String empresa = "20603132271"; //args[0]; ////  "20498596356";
          //   String ubicacionContext = "C:\\Program Files\\Apache Software Foundation\\Apache Tomcat 7.0.34\\webapps\\Factuya" /*Utilitario.ubicacionProyecto() */ + "/META-INF/context.xml";//"C:\\Program Files\\Apache Software Foundation\\Apache Tomcat 7.0.34\\webapps\\Factuya"
@@ -214,6 +214,70 @@ public class clsEnvioGuiaRemision {
         }
     }
     // </editor-fold>
+    
+    // <editor-fold defaultstate="collapsed" desc="enviarGuiaPendientes">
+    public static void enviarGuiasPendientes(String empresa) {
+        try {
+            // Enviar Facturas Pendientes
+            CallableStatement callsec;
+            ResultSet rssec;
+
+            Connection con = clsConexion.obtenerConexion(clsParametrosFactuya.host, clsParametrosFactuya.usuarioBD, clsParametrosFactuya.passwordBD);
+
+           
+
+            sql = "SELECT * FROM " + nombreEsquema + ".fun_gel_consulta_guiaremision_pendiente ("
+                    + "'" + empresa + "')";
+
+            System.out.println(sql);
+            callsec = con.prepareCall(sql);
+            if (callsec.execute()) {
+                rssec = callsec.getResultSet();
+                if (rssec != null) {
+                    while (rssec.next()) {
+                        serie = rssec.getString("serie");
+                        numero = rssec.getString("numero");
+                        ruc = rssec.getString("ruc");
+                        // usuario = "admin";//rssec.getString("usuario");
+                        String rpta = "-1";
+                        // FALTA
+                        File file = new File(ubicacionServidor + rssec.getString("nombrearchivo") + ".zip");
+                        // COMPROBAR SI EXISTE ARCHIVO DE REPUESTA de FACTURA
+                        if (serie.substring(0, 1).equals("F")) {
+                            File filerpta = new File(ubicacionServidor + rssec.getString("nombrearchivo") + "-R.zip");
+                            if (filerpta.exists()) {
+                                rpta = Utilitario.searchAnswer(ubicacionServidor, rssec.getString("nombrearchivo") + "-R.zip", "cbc:ResponseCode");
+                            }
+                        }
+                        if (!rpta.equals("0")) {// archivo de respuesta diferente de aceptado
+                            System.out.println("Mostar CPE ... " + ubicacionServidor + rssec.getString("nombrearchivo") + ".zip");
+                             if (rssec.getString("rutaxml") == null) {
+                                
+                                    enviarUnaGuia();
+                                
+
+                            }
+
+                        } else {
+                            clsEnvioGuiaCPE.updateCPE(ruc, serie, numero, "", "ACE", "", "", "", rssec.getString("nombrearchivo") + "-R.zip", "NOW()", usuario, "");
+                        }
+
+                        serie = null;
+                        numero = null;
+                    }
+                }
+            }
+            clsConexion.cerrarConexion(con);
+        } catch (SQLException e) {
+            mensaje = mensaje + "... Error SQL " + e.getMessage() + "...\n";
+            // progress(mensaje);
+        } catch (Exception e) {
+            e.printStackTrace();
+            mensaje = mensaje + "... Error " + e.getMessage() + "...\n";
+            // progress(mensaje);
+        }
+    }
+     // </editor-fold>
     
     // <editor-fold defaultstate="collapsed" desc="firmarByteCPE">
 

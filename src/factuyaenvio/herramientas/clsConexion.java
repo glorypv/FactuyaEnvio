@@ -36,6 +36,7 @@ public class clsConexion {
 
             try {
                 Class.forName("org.postgresql.Driver");
+                
             } catch (ClassNotFoundException ex) {
                 System.out.println("Error al registrar el driver de PostgreSQL: " + ex);
             }
@@ -45,6 +46,8 @@ public class clsConexion {
                     url,
                     usuario,
                     contraseña);
+             System.out.println("Conexión PostgreSQL: " + varConexion);
+            
         } catch (SQLException ex) {
             Logger.getLogger(clsConexion.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception ex) {
@@ -62,6 +65,8 @@ public class clsConexion {
             //  DataSource ds = (DataSource) context.lookup("jdbc/pgpool_comet");
             DataSource ds = (DataSource) context.lookup("jdbc/pgpool_factuya_servidor_externo");
             varConexion = ds.getConnection();
+            
+             System.out.println("Conexión Externa PostgreSQL: " + varConexion);
 
         } catch (Exception e) {
             e.printStackTrace();

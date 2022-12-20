@@ -103,7 +103,9 @@ public class clsParametrosFactuya {
     public static String puertoSHExterno = "";
     public static String usuarioSHExterno = "";
     public static String passwordSHExterno = "";
+   public static String usuarioCorreoRemitente="";
 
+    
 // </editor-fold>
     public clsParametrosFactuya(String _empresa, String context) {
         this.empresa = _empresa;
@@ -112,167 +114,174 @@ public class clsParametrosFactuya {
 
     public void cargarParametros() {
         empresa = empresa + "_";
+        try {
 
-        NodeList nodeListConceptos = cargarDocumento("/Context/Parameter");
+            NodeList nodeListConceptos = cargarDocumento("/Context/Parameter");
 
-        // Avanzamos por la lista para presentar los conceptos
-        for (int temp = 0; temp < nodeListConceptos.getLength(); temp++) {
+            // Avanzamos por la lista para presentar los conceptos
+            for (int temp = 0; temp < nodeListConceptos.getLength(); temp++) {
 
-            // Obtenemos un nodo
-            Node nodoConcepto = nodeListConceptos.item(temp);
+                // Obtenemos un nodo
+                Node nodoConcepto = nodeListConceptos.item(temp);
 
-            // Verificamos que el nodo sea un elemento, para prevenir errores
-            if (nodoConcepto.getNodeType() == Node.ELEMENT_NODE) {
+                // Verificamos que el nodo sea un elemento, para prevenir errores
+                if (nodoConcepto.getNodeType() == Node.ELEMENT_NODE) {
 
-                // Convertimos de Node a elemento
-                Element elementoConcepto = (Element) nodoConcepto;
-                //  System.out.println("" + elementoConcepto.getAttribute("name") + "  :  " + elementoConcepto.getAttribute("value"));
+                    // Convertimos de Node a elemento
+                    Element elementoConcepto = (Element) nodoConcepto;
+                    //  System.out.println("" + elementoConcepto.getAttribute("name") + "  :  " + elementoConcepto.getAttribute("value"));
 
-                if (elementoConcepto.getAttribute("name").equals(empresa + "subirServidor")) {
-                    subirServidor = Boolean.valueOf(elementoConcepto.getAttribute("value"));
-                }
-                if (elementoConcepto.getAttribute("name").equals(empresa + "ubicacionServidor")) {
-                    ubicacionServidor = elementoConcepto.getAttribute("value");
-                }
-                if (elementoConcepto.getAttribute("name").equals(empresa + "cargo")) {
-                    cargo = Boolean.valueOf(elementoConcepto.getAttribute("value"));
-                }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "subirServidor")) {
+                        subirServidor = Boolean.valueOf(elementoConcepto.getAttribute("value"));
+                    }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "ubicacionServidor")) {
+                        ubicacionServidor = elementoConcepto.getAttribute("value");
+                    }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "cargo")) {
+                        cargo = Boolean.valueOf(elementoConcepto.getAttribute("value"));
+                    }
 
-                if (elementoConcepto.getAttribute("name").equals(empresa + "hostSH")) {
-                    hostSH = elementoConcepto.getAttribute("value");
-                }
-                if (elementoConcepto.getAttribute("name").equals(empresa + "puertoSH")) {
-                    puertoSH = elementoConcepto.getAttribute("value");
-                }
-                if (elementoConcepto.getAttribute("name").equals(empresa + "usuarioSH")) {
-                    usuarioSH = elementoConcepto.getAttribute("value");
-                }
-                if (elementoConcepto.getAttribute("name").equals(empresa + "passwordSH")) {
-                    passwordSH = elementoConcepto.getAttribute("value");
-                }
-                if (elementoConcepto.getAttribute("name").equals(empresa + "tipoEnvio")) {
-                    tipoEnvio = Boolean.valueOf(elementoConcepto.getAttribute("value"));
-                }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "hostSH")) {
+                        hostSH = elementoConcepto.getAttribute("value");
+                    }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "puertoSH")) {
+                        puertoSH = elementoConcepto.getAttribute("value");
+                    }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "usuarioSH")) {
+                        usuarioSH = elementoConcepto.getAttribute("value");
+                    }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "passwordSH")) {
+                        passwordSH = elementoConcepto.getAttribute("value");
+                    }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "tipoEnvio")) {
+                        tipoEnvio = Boolean.valueOf(elementoConcepto.getAttribute("value"));
+                    }
 
-                if (elementoConcepto.getAttribute("name").equals(empresa + "numerRUC")) {
-                    numerRUC = elementoConcepto.getAttribute("value");
-                }
-                if (elementoConcepto.getAttribute("name").equals(empresa + "usuarioSol")) {
-                    usuarioSol = elementoConcepto.getAttribute("value");
-                }
-                if (elementoConcepto.getAttribute("name").equals(empresa + "passwordSol")) {
-                    passwordSol = elementoConcepto.getAttribute("value");
-                }
-                if (elementoConcepto.getAttribute("name").equals(empresa + "nombreCertificado")) {
-                    nombreCertificado = elementoConcepto.getAttribute("value");
-                }
-                if (elementoConcepto.getAttribute("name").equals(empresa + "passwordCertificado")) {
-                    passwordCertificado = elementoConcepto.getAttribute("value");
-                }
-                if (elementoConcepto.getAttribute("name").equals(empresa + "ubicacionCertificado")) {
-                    ubicacionCertificado = elementoConcepto.getAttribute("value");
-                }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "numerRUC")) {
+                        numerRUC = elementoConcepto.getAttribute("value");
+                    }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "usuarioSol")) {
+                        usuarioSol = elementoConcepto.getAttribute("value");
+                    }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "passwordSol")) {
+                        passwordSol = elementoConcepto.getAttribute("value");
+                    }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "nombreCertificado")) {
+                        nombreCertificado = elementoConcepto.getAttribute("value");
+                    }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "passwordCertificado")) {
+                        passwordCertificado = elementoConcepto.getAttribute("value");
+                    }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "ubicacionCertificado")) {
+                        ubicacionCertificado = elementoConcepto.getAttribute("value");
+                    }
 
-                if (elementoConcepto.getAttribute("name").equals(empresa + "enviarResumenDiario")) {
-                    enviarResumenDiario = Boolean.valueOf(elementoConcepto.getAttribute("value"));
-                }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "enviarResumenDiario")) {
+                        enviarResumenDiario = Boolean.valueOf(elementoConcepto.getAttribute("value"));
+                    }
 
-                if (elementoConcepto.getAttribute("name").equals(empresa + "enviarAnulados")) {
-                    enviarAnulados = Boolean.valueOf(elementoConcepto.getAttribute("value"));
-                }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "enviarAnulados")) {
+                        enviarAnulados = Boolean.valueOf(elementoConcepto.getAttribute("value"));
+                    }
 
-                if (elementoConcepto.getAttribute("name").equals(empresa + "enviarCorreo")) {
-                    enviarCorreo = Boolean.valueOf(elementoConcepto.getAttribute("value"));
-                }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "enviarCorreo")) {
+                        enviarCorreo = Boolean.valueOf(elementoConcepto.getAttribute("value"));
+                    }
 
-                if (elementoConcepto.getAttribute("name").equals(empresa + "usuarioCorreo")) {
-                    usuarioCorreo = elementoConcepto.getAttribute("value");
-                }
-                if (elementoConcepto.getAttribute("name").equals(empresa + "passwordCorreo")) {
-                    passwordCorreo = elementoConcepto.getAttribute("value");
-                }
-                if (elementoConcepto.getAttribute("name").equals(empresa + "ubicacionFormatos")) {
-                    ubicacionFormatos = elementoConcepto.getAttribute("value");
-                }
-                if (elementoConcepto.getAttribute("name").equals(empresa + "ubicacionImagenes")) {
-                    ubicacionImagenes = elementoConcepto.getAttribute("value");
-                }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "usuarioCorreo")) {
+                        usuarioCorreo = elementoConcepto.getAttribute("value");
+                    }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "passwordCorreo")) {
+                        passwordCorreo = elementoConcepto.getAttribute("value");
+                    }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "ubicacionFormatos")) {
+                        ubicacionFormatos = elementoConcepto.getAttribute("value");
+                    }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "ubicacionImagenes")) {
+                        ubicacionImagenes = elementoConcepto.getAttribute("value");
+                    }
 
-                if (elementoConcepto.getAttribute("name").equals(empresa + "hostCorreoPrincipal")) {
-                    hostCorreoPrincipal = elementoConcepto.getAttribute("value");
-                }
-                if (elementoConcepto.getAttribute("name").equals(empresa + "hostCorreo")) {
-                    hostCorreo = elementoConcepto.getAttribute("value");
-                }
-                if (elementoConcepto.getAttribute("name").equals(empresa + "puertoCorreo")) {
-                    puertoCorreo = elementoConcepto.getAttribute("value");
-                }
-                if (elementoConcepto.getAttribute("name").equals(empresa + "reenviarCPEAcpetados")) {
-                    reenviarCPEAcpetados = Boolean.valueOf(elementoConcepto.getAttribute("value"));
-                }
-                if (elementoConcepto.getAttribute("name").equals(empresa + "ubicacionPrincipal")) {
-                    ubicacionPrincipal = elementoConcepto.getAttribute("value");
-                }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "hostCorreoPrincipal")) {
+                        hostCorreoPrincipal = elementoConcepto.getAttribute("value");
+                    }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "hostCorreo")) {
+                        hostCorreo = elementoConcepto.getAttribute("value");
+                    }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "puertoCorreo")) {
+                        puertoCorreo = elementoConcepto.getAttribute("value");
+                    }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "reenviarCPEAcpetados")) {
+                        reenviarCPEAcpetados = Boolean.valueOf(elementoConcepto.getAttribute("value"));
+                    }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "ubicacionPrincipal")) {
+                        ubicacionPrincipal = elementoConcepto.getAttribute("value");
+                    }
 
-                if (elementoConcepto.getAttribute("name").equals(empresa + "ubicacionSunatEnvio")) {
-                    ubicacionSunatEnvio = elementoConcepto.getAttribute("value");
-                }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "ubicacionSunatEnvio")) {
+                        ubicacionSunatEnvio = elementoConcepto.getAttribute("value");
+                    }
 
-                if (elementoConcepto.getAttribute("name").equals(empresa + "ubicacionSunatRespuesta")) {
-                    ubicacionSunatRespuesta = elementoConcepto.getAttribute("value");
-                }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "ubicacionSunatRespuesta")) {
+                        ubicacionSunatRespuesta = elementoConcepto.getAttribute("value");
+                    }
 
-                if (elementoConcepto.getAttribute("name").equals(empresa + "ubicacionSunatTemporal")) {
-                    ubicacionSunatTemporal = elementoConcepto.getAttribute("value");
-                }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "ubicacionSunatTemporal")) {
+                        ubicacionSunatTemporal = elementoConcepto.getAttribute("value");
+                    }
 
-                if (elementoConcepto.getAttribute("name").equals(empresa + "enviarSUNAT")) {
-                    enviarSUNAT = Integer.valueOf(elementoConcepto.getAttribute("value"));
-                }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "enviarSUNAT")) {
+                        enviarSUNAT = Integer.valueOf(elementoConcepto.getAttribute("value"));
+                    }
 
-                if (elementoConcepto.getAttribute("name").equals(empresa + "detraccioncuenta")) {
-                    detracionCuenta = elementoConcepto.getAttribute("value");
-                }
-                if (elementoConcepto.getAttribute("name").equals(empresa + "menu")) {
-                    menu = elementoConcepto.getAttribute("value");
-                }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "detraccioncuenta")) {
+                        detracionCuenta = elementoConcepto.getAttribute("value");
+                    }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "menu")) {
+                        menu = elementoConcepto.getAttribute("value");
+                    }
 
-                if (elementoConcepto.getAttribute("name").equals(empresa + "subirServidorExterno")) {
-                    subirServidorExterno = Boolean.valueOf(elementoConcepto.getAttribute("value"));
-                }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "subirServidorExterno")) {
+                        subirServidorExterno = Boolean.valueOf(elementoConcepto.getAttribute("value"));
+                    }
 
-                if (elementoConcepto.getAttribute("name").equals(empresa + "ubicacionServidorExterno")) {
-                    ubicacionServidorExterno = elementoConcepto.getAttribute("value");
-                }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "ubicacionServidorExterno")) {
+                        ubicacionServidorExterno = elementoConcepto.getAttribute("value");
+                    }
 
-                if (elementoConcepto.getAttribute("name").equals(empresa + "hostSHExterno")) {
-                    hostSHExterno = elementoConcepto.getAttribute("value");
-                }
-                if (elementoConcepto.getAttribute("name").equals(empresa + "puertoSHExterno")) {
-                    puertoSHExterno = elementoConcepto.getAttribute("value");
-                }
-                if (elementoConcepto.getAttribute("name").equals(empresa + "usuarioSHExterno")) {
-                    usuarioSHExterno = elementoConcepto.getAttribute("value");
-                }
-                if (elementoConcepto.getAttribute("name").equals(empresa + "passwordSHExterno")) {
-                    passwordSHExterno = elementoConcepto.getAttribute("value");
-                }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "hostSHExterno")) {
+                        hostSHExterno = elementoConcepto.getAttribute("value");
+                    }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "puertoSHExterno")) {
+                        puertoSHExterno = elementoConcepto.getAttribute("value");
+                    }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "usuarioSHExterno")) {
+                        usuarioSHExterno = elementoConcepto.getAttribute("value");
+                    }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "passwordSHExterno")) {
+                        passwordSHExterno = elementoConcepto.getAttribute("value");
+                    }
+                    if (elementoConcepto.getAttribute("name").equals(empresa + "usuarioCorreoRemitente")) {
+                        usuarioCorreoRemitente = elementoConcepto.getAttribute("value");
+                    }
+                    
 
-                if (cargo) {
-                    nombreEsquema = "cargo";
-                    nombreTablaComprobantes = "tblcomprobantesventacabecera_cvc";
-                    nombreEsquemaCPE = "public";
-                    campoEmpresa = "cvc.emp_codigo=emp.emp_codigo";;
-                    campoMoneda = "'SOL'";
-                    campoFechaemision = "cvc_fecemision";
-                    campoTipoDocumento = "dti_codigo";
-                    campoEmpresaId = "emp_codigo";
-                    campoEmpresaRuc = "emp_codigo";
-                    campoEmpresaRazonSocial = "emp_nombre";
-                    campoEntidadTipo = "ent_tipodocumento";
+                    if (cargo) {
+                        nombreEsquema = "cargo";
+                        nombreTablaComprobantes = "tblcomprobantesventacabecera_cvc";
+                        nombreEsquemaCPE = "public";
+                        campoEmpresa = "cvc.emp_codigo=emp.emp_codigo";;
+                        campoMoneda = "'SOL'";
+                        campoFechaemision = "cvc_fecemision";
+                        campoTipoDocumento = "dti_codigo";
+                        campoEmpresaId = "emp_codigo";
+                        campoEmpresaRuc = "emp_codigo";
+                        campoEmpresaRazonSocial = "emp_nombre";
+                        campoEntidadTipo = "ent_tipodocumento";
+                    }
                 }
-
             }
+        } catch (Exception ex) {
+            System.out.println(ex);
         }
 
     }
@@ -293,11 +302,11 @@ public class clsParametrosFactuya {
 
                 // Convertimos de Node a elemento
                 Element elementoConcepto = (Element) nodoConcepto;
-                System.out.println("" + elementoConcepto.getAttribute("name") + "  :  " + elementoConcepto.getAttribute("url"));
+                /*   System.out.println("" + elementoConcepto.getAttribute("name") + "  :  " + elementoConcepto.getAttribute("url"));
 
-                System.out.println("" + elementoConcepto.getAttribute("name") + "  :  " + elementoConcepto.getAttribute("username"));
-                System.out.println("" + elementoConcepto.getAttribute("name") + "  :  " + elementoConcepto.getAttribute("password"));
-
+                 System.out.println("" + elementoConcepto.getAttribute("name") + "  :  " + elementoConcepto.getAttribute("username"));
+                 System.out.println("" + elementoConcepto.getAttribute("name") + "  :  " + elementoConcepto.getAttribute("password"));
+                 */
                 if (elementoConcepto.getAttribute("name").equals(nombreConexion)) {
                     host = elementoConcepto.getAttribute("url");
                     usuarioBD = elementoConcepto.getAttribute("username");
